@@ -1,0 +1,27 @@
+{
+  "name": "love-sports-ticker",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "24/7 sports newsroom automation: breaking-news detection, anchor script generation, HeyGen avatar rendering, and a manual-approval pipeline that feeds a scrolling ticker + video segment outbox.",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "draft": "tsx src/pipeline/draft.ts",
+    "review": "tsx src/approval/cli.ts",
+    "render": "tsx src/pipeline/render.ts",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vitest": "^3.2.4"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

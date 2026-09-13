@@ -1,0 +1,41 @@
+name: Draft breaking-news segments
+
+# Runs continuously on a schedule so the newsroom keeps producing drafts for weeks without
+# anyone babysitting it. Drafting only writes JSON files under content/drafts/ — it never
+# calls HeyGen, so this costs nothing beyond a couple of ESPN requests per run.
+on:
+  schedule:
+    - cron: "*/20 * * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: bench-warmers-draft
+  cancel-in-progress: false
+
+jobs:
+  draft:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Fetch feeds and write drafts
+        run: npm run draft
+
+      - name: Commit new drafts
+        run: |
+          git config user.name "bench-warmers-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add content/drafts
+          git diff --cached --quiet || git commit -m "chore: new draft segment(s) [automated]"
+          git pull --rebase origin "${GITHUB_REF_NAME}"
+          git push origin "HEAD:${GITHUB_REF_NAME}"

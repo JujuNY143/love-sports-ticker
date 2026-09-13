@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.env
+*.log
+
+# Rendered video binaries are large; keep manifests/metadata only, not the videos themselves.
+content/rendered/*.mp4
+content/rendered/*.mov
