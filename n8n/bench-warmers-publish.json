@@ -1,0 +1,156 @@
+{
+  "name": "Bench Warmers - 2 Publish",
+  "nodes": [
+    {
+      "id": "trigger",
+      "name": "Run Every 30 Minutes",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [0, 0],
+      "parameters": {
+        "rule": { "interval": [{ "field": "minutes", "minutesInterval": 30 }] }
+      }
+    },
+    {
+      "id": "read_control",
+      "name": "Read Control Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [220, 0],
+      "parameters": {
+        "operation": "read",
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "PUT_YOUR_GOOGLE_SHEET_ID_HERE",
+          "cachedResultName": "Bench Warmers Control Sheet"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": "Sheet1",
+          "cachedResultName": "Sheet1"
+        },
+        "options": {}
+      },
+      "notes": "If this shows a red warning after import, click the spreadsheet/sheet fields and reselect from your own dropdown."
+    },
+    {
+      "id": "filter_approved",
+      "name": "Only Approved By You",
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [440, 0],
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "loose" },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "c1",
+              "leftValue": "={{ $json.production_status }}",
+              "rightValue": "approved",
+              "operator": { "type": "string", "operation": "equals" }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "limit_one",
+      "name": "Just One At A Time",
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [660, 0],
+      "parameters": { "maxItems": 1 }
+    },
+    {
+      "id": "download_video",
+      "name": "Download The Video",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [880, 0],
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $json.video_url }}",
+        "options": {
+          "response": { "response": { "responseFormat": "file", "outputPropertyName": "data" } }
+        }
+      }
+    },
+    {
+      "id": "upload_youtube",
+      "name": "Upload To YouTube",
+      "type": "n8n-nodes-base.youTube",
+      "typeVersion": 1,
+      "position": [1100, 0],
+      "parameters": {
+        "resource": "video",
+        "operation": "upload",
+        "title": "={{ $('Just One At A Time').item.json.title }}",
+        "regionCode": "US",
+        "categoryId": "17",
+        "binaryPropertyName": "data",
+        "options": {
+          "description": "={{ $('Just One At A Time').item.json.story_idea }}\n\nAutomated Bench Warmers segment.",
+          "privacyStatus": "unlisted"
+        }
+      },
+      "notes": "categoryId 17 = Sports. Change privacyStatus to 'public' once you trust the pipeline; unlisted is the safe default."
+    },
+    {
+      "id": "mark_published",
+      "name": "Mark Published",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [1320, 0],
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "PUT_YOUR_GOOGLE_SHEET_ID_HERE",
+          "cachedResultName": "Bench Warmers Control Sheet"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": "Sheet1",
+          "cachedResultName": "Sheet1"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "matchingColumns": ["id"],
+          "value": {
+            "id": "={{ $('Just One At A Time').item.json.id }}",
+            "production_status": "published",
+            "notes": "={{ 'https://www.youtube.com/watch?v=' + $json.id }}"
+          },
+          "schema": [
+            { "id": "id", "displayName": "id", "type": "string", "required": false, "defaultMatch": true, "canBeUsedToMatch": true },
+            { "id": "title", "displayName": "title", "type": "string", "required": false, "defaultMatch": false, "canBeUsedToMatch": true },
+            { "id": "story_idea", "displayName": "story_idea", "type": "string", "required": false, "defaultMatch": false, "canBeUsedToMatch": true },
+            { "id": "character", "displayName": "character", "type": "string", "required": false, "defaultMatch": false, "canBeUsedToMatch": true },
+            { "id": "script_override", "displayName": "script_override", "type": "string", "required": false, "defaultMatch": false, "canBeUsedToMatch": true },
+            { "id": "production_status", "displayName": "production_status", "type": "string", "required": false, "defaultMatch": false, "canBeUsedToMatch": true },
+            { "id": "video_url", "displayName": "video_url", "type": "string", "required": false, "defaultMatch": false, "canBeUsedToMatch": true },
+            { "id": "heygen_video_id", "displayName": "heygen_video_id", "type": "string", "required": false, "defaultMatch": false, "canBeUsedToMatch": true },
+            { "id": "notes", "displayName": "notes", "type": "string", "required": false, "defaultMatch": false, "canBeUsedToMatch": true }
+          ]
+        },
+        "options": {}
+      }
+    }
+  ],
+  "connections": {
+    "Run Every 30 Minutes": { "main": [[{ "node": "Read Control Sheet", "type": "main", "index": 0 }]] },
+    "Read Control Sheet": { "main": [[{ "node": "Only Approved By You", "type": "main", "index": 0 }]] },
+    "Only Approved By You": { "main": [[{ "node": "Just One At A Time", "type": "main", "index": 0 }]] },
+    "Just One At A Time": { "main": [[{ "node": "Download The Video", "type": "main", "index": 0 }]] },
+    "Download The Video": { "main": [[{ "node": "Upload To YouTube", "type": "main", "index": 0 }]] },
+    "Upload To YouTube": { "main": [[{ "node": "Mark Published", "type": "main", "index": 0 }]] }
+  },
+  "active": false,
+  "settings": { "executionOrder": "v1" },
+  "pinData": {}
+}

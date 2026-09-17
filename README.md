@@ -1,10 +1,20 @@
 # love-sports-ticker — Bench Warmers newsroom automation
 
-Automation pipeline for a 24/7 sports YouTube channel: detects breaking news, writes
-anchor scripts, renders them as HeyGen avatar videos, and gates every render behind a
-human approval step. Designed to run unattended for weeks via scheduled GitHub Actions.
-Your existing scrolling ticker is a separate on-screen element — this pipeline produces
-the talking-head video *segments* that sit alongside it; see "Where this fits" below.
+Automation for a 24/7 sports YouTube channel, in two forms:
+
+- **`n8n/`** — a no-code n8n workflow (Google Sheets → HeyGen avatar video → manual
+  approval in the sheet → YouTube upload). **Start here if you're not a coder** —
+  see [`n8n/SETUP.md`](n8n/SETUP.md) for full click-by-click setup.
+- **`src/`** — the original TypeScript/GitHub-Actions version of the same idea (feed
+  detection + HeyGen + git-based approval), kept as a coder-friendly alternative.
+
+Both gate every render behind a human approval step and are designed to run
+unattended for weeks. Your existing scrolling ticker is a separate on-screen
+element — these produce the talking-head video *segments* that sit alongside it.
+
+## TypeScript pipeline
+
+The rest of this README documents the `src/` pipeline.
 
 ## Pipeline
 

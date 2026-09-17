@@ -1,0 +1,413 @@
+{
+  "name": "Bench Warmers - 1 Generate",
+  "nodes": [
+    {
+      "id": "trigger",
+      "name": "Run Every Hour",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [0, 0],
+      "parameters": {
+        "rule": { "interval": [{ "field": "hours", "hoursInterval": 1 }] }
+      }
+    },
+    {
+      "id": "read_control",
+      "name": "Read Control Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [220, 0],
+      "parameters": {
+        "operation": "read",
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "PUT_YOUR_GOOGLE_SHEET_ID_HERE",
+          "cachedResultName": "Bench Warmers Control Sheet"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": "Sheet1",
+          "cachedResultName": "Sheet1"
+        },
+        "options": {}
+      },
+      "notes": "If this shows a red warning after import, click the spreadsheet/sheet fields and reselect from your own dropdown."
+    },
+    {
+      "id": "filter_create",
+      "name": "Only Ready To Create",
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [440, 0],
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "loose" },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "c1",
+              "leftValue": "={{ $json.production_status }}",
+              "rightValue": "create",
+              "operator": { "type": "string", "operation": "equals" }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "limit_one_row",
+      "name": "Just One At A Time",
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [660, 0],
+      "parameters": { "maxItems": 1 }
+    },
+    {
+      "id": "read_characters",
+      "name": "Read Characters Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [880, 0],
+      "parameters": {
+        "operation": "read",
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "PUT_YOUR_GOOGLE_SHEET_ID_HERE",
+          "cachedResultName": "Bench Warmers Control Sheet"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": "Characters",
+          "cachedResultName": "Characters"
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "filter_character",
+      "name": "Match Character",
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [1100, 0],
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "loose" },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "c1",
+              "leftValue": "={{ $json.character }}",
+              "rightValue": "={{ $('Just One At A Time').item.json.character }}",
+              "operator": { "type": "string", "operation": "equals" }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "limit_one_character",
+      "name": "Just One Character Row",
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [1320, 0],
+      "parameters": { "maxItems": 1 }
+    },
+    {
+      "id": "build_script",
+      "name": "Build The Script",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [1540, 0],
+      "parameters": {
+        "mode": "manual",
+        "assignments": {
+          "assignments": [
+            { "id": "a1", "name": "row_id", "type": "string", "value": "={{ $('Just One At A Time').item.json.id }}" },
+            { "id": "a2", "name": "title", "type": "string", "value": "={{ $('Just One At A Time').item.json.title }}" },
+            { "id": "a3", "name": "avatar_id", "type": "string", "value": "={{ $json.heygen_avatar_id }}" },
+            { "id": "a4", "name": "voice_id", "type": "string", "value": "={{ $json.heygen_voice_id }}" },
+            {
+              "id": "a5",
+              "name": "script",
+              "type": "string",
+              "value": "={{ $json.sign_on }} {{ $('Just One At A Time').item.json.script_override || $('Just One At A Time').item.json.story_idea }} {{ $json.sign_off }}"
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "heygen_generate",
+      "name": "Ask HeyGen To Make The Video",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1760, 0],
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.heygen.com/v2/video/generate",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [{ "name": "Content-Type", "value": "application/json" }] },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ video_inputs: [ { character: { type: \"avatar\", avatar_id: $json.avatar_id, avatar_style: \"normal\" }, voice: { type: \"text\", input_text: $json.script, voice_id: $json.voice_id } } ], dimension: { width: 1280, height: 720 } }) }}",
+        "options": {}
+      },
+      "notes": "Attach your HeyGen credential (Header Auth, header name X-Api-Key) here."
+    },
+    {
+      "id": "mark_generating",
+      "name": "Mark As Generating",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [1980, 0],
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "PUT_YOUR_GOOGLE_SHEET_ID_HERE",
+          "cachedResultName": "Bench Warmers Control Sheet"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": "Sheet1",
+          "cachedResultName": "Sheet1"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "matchingColumns": ["id"],
+          "value": {
+            "id": "={{ $('Build The Script').item.json.row_id }}",
+            "production_status": "generating",
+            "heygen_video_id": "={{ $json.data.video_id }}"
+          },
+          "schema": [
+            { "id": "id", "displayName": "id", "type": "string", "required": false, "defaultMatch": true, "canBeUsedToMatch": true },
+            { "id": "title", "displayName": "title", "type": "string", "required": false, "defaultMatch": false, "canBeUsedToMatch": true },
+            { "id": "story_idea", "displayName": "story_idea", "type": "string", "required": false, "defaultMatch": false, "canBeUsedToMatch": true },
+            { "id": "character", "displayName": "character", "type": "string", "required": false, "defaultMatch": false, "canBeUsedToMatch": true },
+            { "id": "script_override", "displayName": "script_override", "type": "string", "required": false, "defaultMatch": false, "canBeUsedToMatch": true },
+            { "id": "production_status", "displayName": "production_status", "type": "string", "required": false, "defaultMatch": false, "canBeUsedToMatch": true },
+            { "id": "video_url", "displayName": "video_url", "type": "string", "required": false, "defaultMatch": false, "canBeUsedToMatch": true },
+            { "id": "heygen_video_id", "displayName": "heygen_video_id", "type": "string", "required": false, "defaultMatch": false, "canBeUsedToMatch": true },
+            { "id": "notes", "displayName": "notes", "type": "string", "required": false, "defaultMatch": false, "canBeUsedToMatch": true }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "wait_3",
+      "name": "Wait 3 Minutes",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [2200, 0],
+      "webhookId": "wait-3-bench-warmers",
+      "parameters": { "amount": 3, "unit": "minutes" }
+    },
+    {
+      "id": "check_1",
+      "name": "Check If Video Is Ready",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [2420, 0],
+      "parameters": {
+        "method": "GET",
+        "url": "={{ 'https://api.heygen.com/v1/video_status.get?video_id=' + $('Ask HeyGen To Make The Video').item.json.data.video_id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      }
+    },
+    {
+      "id": "if_done_1",
+      "name": "Is It Done Yet",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [2640, 0],
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "loose" },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "c1",
+              "leftValue": "={{ $json.data.status }}",
+              "rightValue": "completed",
+              "operator": { "type": "string", "operation": "equals" }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "wait_2",
+      "name": "Wait 2 More Minutes",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [2860, 160],
+      "webhookId": "wait-2-bench-warmers",
+      "parameters": { "amount": 2, "unit": "minutes" }
+    },
+    {
+      "id": "check_2",
+      "name": "Check Again",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [3080, 160],
+      "parameters": {
+        "method": "GET",
+        "url": "={{ 'https://api.heygen.com/v1/video_status.get?video_id=' + $('Ask HeyGen To Make The Video').item.json.data.video_id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      }
+    },
+    {
+      "id": "if_done_2",
+      "name": "Is It Done Now",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [3300, 160],
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "loose" },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "c1",
+              "leftValue": "={{ $json.data.status }}",
+              "rightValue": "completed",
+              "operator": { "type": "string", "operation": "equals" }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "mark_pending_approval",
+      "name": "Mark Pending Approval",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [2860, -80],
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "PUT_YOUR_GOOGLE_SHEET_ID_HERE",
+          "cachedResultName": "Bench Warmers Control Sheet"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": "Sheet1",
+          "cachedResultName": "Sheet1"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "matchingColumns": ["id"],
+          "value": {
+            "id": "={{ $('Build The Script').item.json.row_id }}",
+            "production_status": "pending approval",
+            "video_url": "={{ $json.data.video_url }}"
+          },
+          "schema": [
+            { "id": "id", "displayName": "id", "type": "string", "required": false, "defaultMatch": true, "canBeUsedToMatch": true },
+            { "id": "title", "displayName": "title", "type": "string", "required": false, "defaultMatch": false, "canBeUsedToMatch": true },
+            { "id": "story_idea", "displayName": "story_idea", "type": "string", "required": false, "defaultMatch": false, "canBeUsedToMatch": true },
+            { "id": "character", "displayName": "character", "type": "string", "required": false, "defaultMatch": false, "canBeUsedToMatch": true },
+            { "id": "script_override", "displayName": "script_override", "type": "string", "required": false, "defaultMatch": false, "canBeUsedToMatch": true },
+            { "id": "production_status", "displayName": "production_status", "type": "string", "required": false, "defaultMatch": false, "canBeUsedToMatch": true },
+            { "id": "video_url", "displayName": "video_url", "type": "string", "required": false, "defaultMatch": false, "canBeUsedToMatch": true },
+            { "id": "heygen_video_id", "displayName": "heygen_video_id", "type": "string", "required": false, "defaultMatch": false, "canBeUsedToMatch": true },
+            { "id": "notes", "displayName": "notes", "type": "string", "required": false, "defaultMatch": false, "canBeUsedToMatch": true }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "mark_failed",
+      "name": "Mark As Failed",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [3520, 260],
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "PUT_YOUR_GOOGLE_SHEET_ID_HERE",
+          "cachedResultName": "Bench Warmers Control Sheet"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": "Sheet1",
+          "cachedResultName": "Sheet1"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "matchingColumns": ["id"],
+          "value": {
+            "id": "={{ $('Build The Script').item.json.row_id }}",
+            "production_status": "generation_failed",
+            "notes": "HeyGen took longer than 5 minutes. Check your HeyGen dashboard for the real status, then change this row's production_status back to 'create' to try again."
+          },
+          "schema": [
+            { "id": "id", "displayName": "id", "type": "string", "required": false, "defaultMatch": true, "canBeUsedToMatch": true },
+            { "id": "title", "displayName": "title", "type": "string", "required": false, "defaultMatch": false, "canBeUsedToMatch": true },
+            { "id": "story_idea", "displayName": "story_idea", "type": "string", "required": false, "defaultMatch": false, "canBeUsedToMatch": true },
+            { "id": "character", "displayName": "character", "type": "string", "required": false, "defaultMatch": false, "canBeUsedToMatch": true },
+            { "id": "script_override", "displayName": "script_override", "type": "string", "required": false, "defaultMatch": false, "canBeUsedToMatch": true },
+            { "id": "production_status", "displayName": "production_status", "type": "string", "required": false, "defaultMatch": false, "canBeUsedToMatch": true },
+            { "id": "video_url", "displayName": "video_url", "type": "string", "required": false, "defaultMatch": false, "canBeUsedToMatch": true },
+            { "id": "heygen_video_id", "displayName": "heygen_video_id", "type": "string", "required": false, "defaultMatch": false, "canBeUsedToMatch": true },
+            { "id": "notes", "displayName": "notes", "type": "string", "required": false, "defaultMatch": false, "canBeUsedToMatch": true }
+          ]
+        },
+        "options": {}
+      }
+    }
+  ],
+  "connections": {
+    "Run Every Hour": { "main": [[{ "node": "Read Control Sheet", "type": "main", "index": 0 }]] },
+    "Read Control Sheet": { "main": [[{ "node": "Only Ready To Create", "type": "main", "index": 0 }]] },
+    "Only Ready To Create": { "main": [[{ "node": "Just One At A Time", "type": "main", "index": 0 }]] },
+    "Just One At A Time": { "main": [[{ "node": "Read Characters Sheet", "type": "main", "index": 0 }]] },
+    "Read Characters Sheet": { "main": [[{ "node": "Match Character", "type": "main", "index": 0 }]] },
+    "Match Character": { "main": [[{ "node": "Just One Character Row", "type": "main", "index": 0 }]] },
+    "Just One Character Row": { "main": [[{ "node": "Build The Script", "type": "main", "index": 0 }]] },
+    "Build The Script": { "main": [[{ "node": "Ask HeyGen To Make The Video", "type": "main", "index": 0 }]] },
+    "Ask HeyGen To Make The Video": { "main": [[{ "node": "Mark As Generating", "type": "main", "index": 0 }]] },
+    "Mark As Generating": { "main": [[{ "node": "Wait 3 Minutes", "type": "main", "index": 0 }]] },
+    "Wait 3 Minutes": { "main": [[{ "node": "Check If Video Is Ready", "type": "main", "index": 0 }]] },
+    "Check If Video Is Ready": { "main": [[{ "node": "Is It Done Yet", "type": "main", "index": 0 }]] },
+    "Is It Done Yet": {
+      "main": [
+        [{ "node": "Mark Pending Approval", "type": "main", "index": 0 }],
+        [{ "node": "Wait 2 More Minutes", "type": "main", "index": 0 }]
+      ]
+    },
+    "Wait 2 More Minutes": { "main": [[{ "node": "Check Again", "type": "main", "index": 0 }]] },
+    "Check Again": { "main": [[{ "node": "Is It Done Now", "type": "main", "index": 0 }]] },
+    "Is It Done Now": {
+      "main": [
+        [{ "node": "Mark Pending Approval", "type": "main", "index": 0 }],
+        [{ "node": "Mark As Failed", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "active": false,
+  "settings": { "executionOrder": "v1" },
+  "pinData": {}
+}
