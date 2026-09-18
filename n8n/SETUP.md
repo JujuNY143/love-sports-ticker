@@ -1,14 +1,27 @@
 # Bench Warmers — n8n setup (no coding required)
 
 This turns a Google Sheet into a 24/7 pipeline: you type a title + story idea in a
-spreadsheet row, HeyGen renders it as an avatar video, you watch it and approve or
-reject it, and approved ones get uploaded to YouTube automatically (as **unlisted**,
-so nothing goes public without you separately flipping it to public in YouTube Studio).
+spreadsheet row, **Claude writes the script**, **HeyGen** renders it as an avatar
+video, you watch it and approve or reject it, and approved ones get uploaded to
+YouTube automatically (as **unlisted**, so nothing goes public without you
+separately flipping it to public in YouTube Studio).
 
 You will do some clicking (signing into your own accounts, pasting your HeyGen key).
 You will not write or edit any code. Every step below tells you exactly what to click.
 
 Do these in order. Don't skip ahead — later steps need IDs/keys from earlier ones.
+
+## Accounts/subscriptions you need to open
+
+| # | What | Cost | Why |
+|---|---|---|---|
+| 1 | Google account (free) | Free | Google Sheets = your control panel, plus the Google Cloud project in step 6 |
+| 2 | YouTube channel on that Google account | Free | Where videos get uploaded |
+| 3 | [n8n.io](https://n8n.io) — **n8n Cloud** | Free trial, then a flat monthly plan | Runs the automation 24/7, no server to manage |
+| 4 | [app.heygen.com](https://app.heygen.com) — HeyGen | You already have this | Generates the avatar video from the script |
+| 5 | [console.anthropic.com](https://console.anthropic.com) — **Anthropic API** | Pay-as-you-go, billed separately (a credit card + a small starting credit balance) | Claude writes the script text. **This is not the same as a claude.ai subscription** — a claude.ai Pro/Max plan does not include API access; API keys and billing live at console.anthropic.com specifically. Cost here is small: a short script is a few hundred tokens, well under a cent per video on Haiku. |
+
+Steps 3 is where the schedule/automation actually lives; steps 4 and 5 are the two "AI" ingredients (Claude writes the words, HeyGen turns them into video).
 
 ---
 
@@ -33,9 +46,9 @@ Do these in order. Don't skip ahead — later steps need IDs/keys from earlier o
 **Columns in `Sheet1`** (one row = one video idea):
 - `id` — any unique number, you assign it
 - `title` — the YouTube video title
-- `story_idea` — what happens in the segment (this becomes the script unless you fill in `script_override`)
+- `story_idea` — what happens in the segment; Claude turns this into the actual spoken script (unless you fill in `script_override`)
 - `character` — must exactly match a row in the `Characters` tab (`coach-ray`, `jules-fastbreak`, or `digest-dana`)
-- `script_override` — optional: write the exact words yourself instead of using `story_idea`
+- `script_override` — optional: give Claude more specific/pre-written material to work from instead of the looser `story_idea` (Claude still writes the final script either way — this isn't a verbatim pass-through)
 - `production_status` — the control switch (see below)
 - `video_url`, `heygen_video_id`, `notes` — filled in automatically, leave blank
 
@@ -89,7 +102,18 @@ Each of the 3 Bench Warmers characters needs a HeyGen avatar + voice:
 
 ---
 
-## 5. Connect Google Sheets in n8n
+## 5. Connect Claude (Anthropic) in n8n
+
+1. Go to [console.anthropic.com](https://console.anthropic.com), sign up if you
+   haven't, and add billing (pay-as-you-go — you don't need to prepay much, a few
+   dollars covers a very large number of these short scripts).
+2. Go to **API Keys**, create a new key, copy it.
+3. In n8n, **Credentials → Add Credential** → search **"Anthropic"** → select it.
+4. Paste your API key in. Save.
+
+---
+
+## 6. Connect Google Sheets in n8n
 
 1. In n8n, **Credentials → Add Credential → Google Sheets Account**.
 2. Click **Sign in with Google**, log in with the Google account that owns your
@@ -99,7 +123,7 @@ Each of the 3 Bench Warmers characters needs a HeyGen avatar + voice:
 
 ---
 
-## 6. Set up YouTube upload access
+## 7. Set up YouTube upload access
 
 This part has more steps because Google requires every app to register its own
 project before it can upload videos to YouTube — there's no way around this, it's
@@ -135,7 +159,7 @@ which isn't necessary for uploading to your own channel.
 
 ---
 
-## 7. Import the two workflows
+## 8. Import the two workflows
 
 1. In n8n, click **Add workflow → Import from File**, and import
    `n8n/bench-warmers-generate.json` from this repo.
@@ -148,15 +172,24 @@ which isn't necessary for uploading to your own channel.
 4. Click each node that has a small red/orange warning badge and attach the matching
    credential from the dropdown:
    - The two **"Ask HeyGen..."** / **"Check..."** HTTP Request nodes → `HeyGen API Key`
+   - **"Claude Model"** → your Anthropic credential
    - Every **Google Sheets** node → your Google Sheets credential
    - **"Upload To YouTube"** → your YouTube OAuth2 credential
    This is completely normal — credentials never travel inside a shared workflow
    file for security, so every imported workflow needs this one-time step.
-5. Click **Save** on both workflows, then toggle **Active** (top-right) to on for both.
+5. **Test the Claude step before trusting the whole thing**: open
+   `Bench Warmers - 1 Generate`, click the **"Write Script With Claude"** node, and
+   click **Execute step** (n8n will pull in whatever's currently in row 1 of your
+   sheet to test with). This is the one part of this workflow I couldn't test-import
+   myself, so check its output looks like an actual script. If it errors or the
+   output doesn't show a `text` field, open the **"Prepare For HeyGen"** node right
+   after it and change `{{ $json.text }}` in the `script` field to match whatever
+   field name Claude's output actually used.
+6. Click **Save** on both workflows, then toggle **Active** (top-right) to on for both.
 
 ---
 
-## 8. Your day-to-day routine
+## 9. Your day-to-day routine
 
 1. **Add ideas**: in `Sheet1`, add a new row any time — `title`, `story_idea`,
    `character`, and set `production_status` to `create`.
@@ -186,6 +219,16 @@ That's it — no code, ever, after this one-time setup.
 - **YouTube upload fails with a permissions error.** Re-open the YouTube OAuth2
   credential in n8n and click Sign in with Google again — Google sometimes expires
   the connection after a few days until the app is fully verified.
-- **Costs**: HeyGen bills per rendered minute of avatar video (check your HeyGen
-  plan/dashboard for the rate) — that's the only per-video cost in this pipeline.
-  n8n Cloud is a flat monthly subscription regardless of how many videos you run.
+- **"Write Script With Claude" errors, or the script that reaches HeyGen is empty/garbled.**
+  This is the newest, least-tested part of the workflow. Click the node, hit
+  **Execute step**, and read the actual error or output:
+  - Credential error → make sure the Anthropic credential is attached to the
+    **Claude Model** node specifically (it's a separate small node next to "Write
+    Script With Claude," easy to miss).
+  - Output looks fine in this node but the video comes out with no dialogue →
+    open **Prepare For HeyGen** and check the `script` field's expression
+    (`{{ $json.text }}`) actually matches the field name shown in Claude node's
+    output panel — rename it in the expression if it's different (e.g. `$json.output`).
+- **Costs**: HeyGen bills per rendered minute of avatar video, Anthropic bills per
+  token (a script this short is a fraction of a cent) — those are the two per-video
+  costs. n8n Cloud is a flat monthly subscription regardless of how many videos you run.
