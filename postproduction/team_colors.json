@@ -1,0 +1,16 @@
+{
+  "LSU": { "primary": "#461D7C", "secondary": "#FDD023" },
+  "OLE MISS": { "primary": "#CE1126", "secondary": "#14213D" },
+  "CLEMSON": { "primary": "#F56600", "secondary": "#522D80" },
+  "NORTH CAROLINA": { "primary": "#7BAFD4", "secondary": "#13294B" },
+  "FLORIDA STATE": { "primary": "#782F40", "secondary": "#CEB888" },
+  "ALABAMA": { "primary": "#9E1B32", "secondary": "#FFFFFF" },
+  "MICHIGAN STATE": { "primary": "#18453B", "secondary": "#FFFFFF" },
+  "NOTRE DAME": { "primary": "#0C2340", "secondary": "#C99700" },
+  "FLORIDA": { "primary": "#0021A5", "secondary": "#FA4616" },
+  "AUBURN": { "primary": "#0C2340", "secondary": "#E86100" },
+  "SMU": { "primary": "#C8102E", "secondary": "#0033A0" },
+  "LOUISVILLE": { "primary": "#AD0000", "secondary": "#000000" },
+  "HOUSTON": { "primary": "#C8102E", "secondary": "#FFFFFF" },
+  "TEXAS TECH": { "primary": "#CC0000", "secondary": "#000000" }
+}

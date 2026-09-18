@@ -1,0 +1,5 @@
+start,end,kind,team1,team2,title,subtitle,notes
+74,79,title_card,LSU,OLE MISS,#7 LSU @ #8 OLE MISS,The Lane Kiffin Bowl,
+74,300,corner_bug,LSU,OLE MISS,LSU vs OLE MISS,,"end=300 (5:00) is a PLACEHOLDER - change to when this game segment actually ends (next game begins)"
+130,193,callout,LSU,,LSU DEFENSE,#2 in SP+ - held La. Tech to 140 total yds,"shows for 8s starting at 'start', not the full window"
+193,300,callout,OLE MISS,,THE PICK,Ole Miss +2.5,"shows for 8s starting at 'start'; end=300 is the same placeholder as the corner_bug row above - keep them matching"
