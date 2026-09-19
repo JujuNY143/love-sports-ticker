@@ -47,7 +47,7 @@ Steps 3 is where the schedule/automation actually lives; steps 4 and 5 are the t
 - `id` — any unique number, you assign it
 - `title` — the YouTube video title
 - `story_idea` — what happens in the segment; Claude turns this into the actual spoken script (unless you fill in `script_override`)
-- `character` — must exactly match a row in the `Characters` tab (`coach-ray`, `jules-fastbreak`, or `digest-dana`)
+- `character` — must exactly match a row in the `Characters` tab (`coach-bobby`, `gigi`, `big-money-lou`, or `josh`)
 - `script_override` — optional: give Claude more specific/pre-written material to work from instead of the looser `story_idea` (Claude still writes the final script either way — this isn't a verbatim pass-through)
 - `production_status` — the control switch (see below)
 - `video_url`, `heygen_video_id`, `notes` — filled in automatically, leave blank

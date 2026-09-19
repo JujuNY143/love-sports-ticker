@@ -24,18 +24,18 @@ const injury: NewsItem = {
 };
 
 describe("writeDraft", () => {
-  it("picks Jules Fastbreak for close games and includes the score", () => {
+  it("picks GiGi for close games and includes the score", () => {
     const draft = writeDraft({ item: closeGame, priority: "notable", reasons: ["test"] });
-    expect(draft.character).toBe("jules-fastbreak");
+    expect(draft.character).toBe("gigi");
     expect(draft.script).toContain("Timberwolves 121");
     expect(draft.script).toContain("Nuggets 118");
     expect(draft.status).toBe("pending");
     expect(draft.estimatedSeconds).toBeGreaterThan(0);
   });
 
-  it("picks Coach Ray for injuries", () => {
+  it("picks Coach Bobby for injuries", () => {
     const draft = writeDraft({ item: injury, priority: "breaking", reasons: ["test"] });
-    expect(draft.character).toBe("coach-ray");
+    expect(draft.character).toBe("coach-bobby");
     expect(draft.script).toContain(injury.headline);
   });
 

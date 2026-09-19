@@ -18,36 +18,43 @@ export interface Character {
 
 export const characters: Character[] = [
   {
-    id: "coach-ray",
-    displayName: "Coach Ray",
-    tone: "gruff veteran analyst, no wasted words",
-    heygenAvatarId: "REPLACE_WITH_HEYGEN_AVATAR_ID_COACH_RAY",
-    heygenVoiceId: "REPLACE_WITH_HEYGEN_VOICE_ID_COACH_RAY",
-    signOn: "Coach Ray here with the news that matters.",
-    signOff: "Back to you in the booth.",
+    id: "coach-bobby",
+    displayName: "Coach Bobby",
+    tone: "veteran analyst, measured and experienced",
+    heygenAvatarId: "REPLACE_WITH_HEYGEN_AVATAR_ID_COACH_BOBBY",
+    heygenVoiceId: "REPLACE_WITH_HEYGEN_VOICE_ID_COACH_BOBBY",
+    signOn: "Coach Bobby here, let's break it down.",
+    signOff: "That's how I see it. Back to you.",
     handles: (item) => item.kind === "injury" || item.kind === "transaction",
   },
   {
-    id: "jules-fastbreak",
-    displayName: "Jules Fastbreak",
+    id: "gigi",
+    displayName: "GiGi",
     tone: "high-energy hype reporter",
-    heygenAvatarId: "REPLACE_WITH_HEYGEN_AVATAR_ID_JULES",
-    heygenVoiceId: "REPLACE_WITH_HEYGEN_VOICE_ID_JULES",
-    signOn: "Jules Fastbreak here, and you will NOT believe what just happened.",
-    signOff: "That's the play of the night. Back to you!",
+    heygenAvatarId: "REPLACE_WITH_HEYGEN_AVATAR_ID_GIGI",
+    heygenVoiceId: "REPLACE_WITH_HEYGEN_VOICE_ID_GIGI",
+    signOn: "It's your girl GiGi, and I've got the tea on this one.",
+    signOff: "That's the play. See you next time!",
     handles: (item) => item.kind === "close_game",
   },
   {
-    id: "digest-dana",
-    displayName: "Digest Dana",
+    id: "josh",
+    displayName: "Josh",
     tone: "calm, steady roundup anchor",
-    heygenAvatarId: "REPLACE_WITH_HEYGEN_AVATAR_ID_DANA",
-    heygenVoiceId: "REPLACE_WITH_HEYGEN_VOICE_ID_DANA",
-    signOn: "Here's what's happening around the league.",
-    signOff: "We'll keep you posted.",
+    heygenAvatarId: "REPLACE_WITH_HEYGEN_AVATAR_ID_JOSH",
+    heygenVoiceId: "REPLACE_WITH_HEYGEN_VOICE_ID_JOSH",
+    signOn: "Josh here with what you need to know.",
+    signOff: "That's the rundown. Back to you.",
     handles: () => true, // fallback for final_score / headline items
   },
 ];
+
+/**
+ * Big Money Lou (betting-angle host) exists in the n8n build's Characters sheet,
+ * chosen manually per row there. He's not wired into this file's auto-pick-by-news-kind
+ * logic below since none of NewsItem's `kind` values map to a betting angle - add one
+ * (e.g. a "line_movement" kind) if this pipeline should route to him automatically.
+ */
 
 /** First character whose `handles` predicate matches; characters list order encodes priority. */
 export function pickCharacter(item: NewsItem): Character {
