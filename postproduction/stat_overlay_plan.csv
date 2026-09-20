@@ -1,0 +1,3 @@
+start,end,kind,image_path,line1,line2,line3,notes
+76,84,player_card,mahomes.jpg,Patrick Mahomes,Kansas City Chiefs - QB,"$505M / 8 yrs","fill in real start/end seconds + bio line + real photo filename"
+84,96,banner,,AAV: $63.1M,2026 Cap Hit: $34.65M,,"amount + one detail line; add more banner rows as the topic shifts (e.g. next season's cap hit)"
