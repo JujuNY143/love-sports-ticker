@@ -440,7 +440,7 @@
           "conditions": [
             {
               "id": "c1",
-              "leftValue": "={{ $json.data.status }}",
+              "leftValue": "={{ $json.status }}",
               "rightValue": "completed",
               "operator": {
                 "type": "string",
@@ -503,7 +503,7 @@
           "conditions": [
             {
               "id": "c1",
-              "leftValue": "={{ $json.data.status }}",
+              "leftValue": "={{ $json.status }}",
               "rightValue": "completed",
               "operator": {
                 "type": "string",
@@ -545,7 +545,7 @@
           "value": {
             "id": "={{ $('Prepare For HeyGen').item.json.row_id }}",
             "production_status": "pending approval",
-            "video_url": "={{ $json.data.video_url }}"
+            "video_url": "={{ $json.video_url }}"
           },
           "schema": [
             {
