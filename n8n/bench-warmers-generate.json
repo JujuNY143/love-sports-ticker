@@ -308,7 +308,7 @@
           "value": {
             "id": "={{ $('Prepare For HeyGen').item.json.row_id }}",
             "production_status": "generating",
-            "heygen_video_id": "={{ $json.data.id }}"
+            "heygen_video_id": "={{ $json.data.video_id }}"
           },
           "schema": [
             {
@@ -414,7 +414,7 @@
       ],
       "parameters": {
         "method": "GET",
-        "url": "={{ 'https://api.heygen.com/v3/videos/' + $('Ask HeyGen To Make The Video').item.json.data.id }}",
+        "url": "={{ 'https://api.heygen.com/v3/videos/' + $('Ask HeyGen To Make The Video').item.json.data.video_id }}",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "options": {}
@@ -477,7 +477,7 @@
       ],
       "parameters": {
         "method": "GET",
-        "url": "={{ 'https://api.heygen.com/v3/videos/' + $('Ask HeyGen To Make The Video').item.json.data.id }}",
+        "url": "={{ 'https://api.heygen.com/v3/videos/' + $('Ask HeyGen To Make The Video').item.json.data.video_id }}",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "options": {}
