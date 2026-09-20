@@ -50,10 +50,11 @@ export const characters: Character[] = [
 ];
 
 /**
- * Big Money Lou (betting-angle host) exists in the n8n build's Characters sheet,
- * chosen manually per row there. He's not wired into this file's auto-pick-by-news-kind
- * logic below since none of NewsItem's `kind` values map to a betting angle - add one
- * (e.g. a "line_movement" kind) if this pipeline should route to him automatically.
+ * Big Money Lou (betting/odds angle) and Goldberg (salary/cap/stats angle) exist in the
+ * n8n build's Characters sheet, chosen manually per row there. Neither is wired into this
+ * file's auto-pick-by-news-kind logic below since none of NewsItem's `kind` values map to
+ * a betting or salary-analysis angle - add one (e.g. "line_movement" or "contract_news")
+ * if this pipeline should route to them automatically.
  */
 
 /** First character whose `handles` predicate matches; characters list order encodes priority. */
