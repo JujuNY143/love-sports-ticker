@@ -390,7 +390,7 @@
     },
     {
       "id": "wait_3",
-      "name": "Wait 3 Minutes",
+      "name": "Wait 5 Minutes",
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
       "position": [
@@ -399,7 +399,7 @@
       ],
       "webhookId": "wait-3-bench-warmers",
       "parameters": {
-        "amount": 3,
+        "amount": 5,
         "unit": "minutes"
       }
     },
@@ -453,7 +453,7 @@
     },
     {
       "id": "wait_2",
-      "name": "Wait 2 More Minutes",
+      "name": "Wait 5 More Minutes",
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
       "position": [
@@ -462,7 +462,7 @@
       ],
       "webhookId": "wait-2-bench-warmers",
       "parameters": {
-        "amount": 2,
+        "amount": 5,
         "unit": "minutes"
       }
     },
@@ -863,14 +863,14 @@
       "main": [
         [
           {
-            "node": "Wait 3 Minutes",
+            "node": "Wait 5 Minutes",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Wait 3 Minutes": {
+    "Wait 5 Minutes": {
       "main": [
         [
           {
@@ -903,14 +903,14 @@
         ],
         [
           {
-            "node": "Wait 2 More Minutes",
+            "node": "Wait 5 More Minutes",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Wait 2 More Minutes": {
+    "Wait 5 More Minutes": {
       "main": [
         [
           {
