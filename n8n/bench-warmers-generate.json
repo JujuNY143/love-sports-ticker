@@ -216,25 +216,25 @@
               "id": "a1",
               "name": "row_id",
               "type": "string",
-              "value": "={{ $('Just One At A Time').item.json.id }}"
+              "value": "={{ $('Just One At A Time').first().json.id }}"
             },
             {
               "id": "a2",
               "name": "title",
               "type": "string",
-              "value": "={{ $('Just One At A Time').item.json.title }}"
+              "value": "={{ $('Just One At A Time').first().json.title }}"
             },
             {
               "id": "a3",
               "name": "avatar_id",
               "type": "string",
-              "value": "={{ $('Just One Character Row').item.json.heygen_avatar_id }}"
+              "value": "={{ $('Just One Character Row').first().json.heygen_avatar_id }}"
             },
             {
               "id": "a4",
               "name": "voice_id",
               "type": "string",
-              "value": "={{ $('Just One Character Row').item.json.heygen_voice_id }}"
+              "value": "={{ $('Just One Character Row').first().json.heygen_voice_id }}"
             },
             {
               "id": "a5",
