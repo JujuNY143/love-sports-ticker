@@ -1,11 +1,11 @@
 rank,player_name,team,position,salary_aav,cap_hit_2026,cap_hit_2027,photo_filename,start_time,end_time,notes
-10,,,,,,,,00:00:00,00:00:00,"mm:ss or hh:mm:ss into NFL_Highest_Paid-Full.mp4 - use the transcript to find where this player's segment begins/ends"
-9,,,,,,,,00:00:00,00:00:00,
-8,,,,,,,,00:00:00,00:00:00,
-7,,,,,,,,00:00:00,00:00:00,
-6,,,,,,,,00:00:00,00:00:00,
-5,,,,,,,,00:00:00,00:00:00,
-4,,,,,,,,00:00:00,00:00:00,
-3,,,,,,,,00:00:00,00:00:00,
-2,,,,,,,,00:00:00,00:00:00,
-1,,,,,,,,00:00:00,00:00:00,
+10,Daniel Jones,Indianapolis Colts,QB,$51.5M,,,daniel-jones.jpg,00:01:11,00:01:52,"Timestamps estimated from narration - verify against on-screen graphic timing in the actual footage"
+9,Justin Herbert,Los Angeles Chargers,QB,$52.5M,,,justin-herbert.jpg,00:01:52,00:02:09,
+8,Jared Goff,Detroit Lions,QB,$53M,,,jared-goff.jpg,00:02:09,00:02:25,
+7,Joe Burrow,Cincinnati Bengals,QB,$55M,,,joe-burrow.jpg,00:02:43,00:02:51,"Tied 7-3 group ($55M each); intro of the group runs 02:25-02:43 before individual mentions - Burrow/Love discussed together, split evenly here"
+6,Jordan Love,Green Bay Packers,QB,$55M,,,jordan-love.jpg,00:02:51,00:02:59,"Tied 7-3 group; see note on rank 7"
+5,Trevor Lawrence,Jacksonville Jaguars,QB,$55M,,,trevor-lawrence.jpg,00:02:59,00:03:07,Tied 7-3 group
+4,Josh Allen,Buffalo Bills,QB,$55M,,,josh-allen.jpg,00:03:07,00:03:25,Tied 7-3 group
+3,Baker Mayfield,Tampa Bay Buccaneers,QB,$55M,,,baker-mayfield.jpg,00:03:25,00:03:54,"Tied 7-3 group; deal is $165M/3yrs; has most career lost turnovers since 2018 (126+)"
+2,Dak Prescott,Dallas Cowboys,QB,$60M,,,dak-prescott.jpg,00:03:54,00:04:15,Previously held the highest-paid title before Mahomes' extension
+1,Patrick Mahomes,Kansas City Chiefs,QB,$63.1M,$34.65M,$90.3M,mahomes.jpg,00:04:15,00:06:05,"First $500M+ contract in NFL history (~$505M/8yrs - transcript's '$55 million over eight seasons' is a caption error, doesn't match AAV x 8yrs or the video's own '$500M+' framing). Cap hit was $78.2M pre-restructure, $34.65M in 2026 post-restructure, $90.3M in 2027. Coming off torn ACL/LCL (Dec 2025), return timeline uncertain."
