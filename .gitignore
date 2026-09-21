@@ -6,3 +6,6 @@ dist/
 # Rendered video binaries are large; keep manifests/metadata only, not the videos themselves.
 content/rendered/*.mp4
 content/rendered/*.mov
+
+# Raw source footage pulled in for editing (e.g. via GitHub release asset) - never commit, too large.
+postproduction/raw/
